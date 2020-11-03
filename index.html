@@ -9,6 +9,21 @@
 <!-- Main -->
 <div class="itemAdded"></div>
 <div class="mainDiv">
+  <div class="searchDiv">
+  <div><input type="text" id="myInput" class="inputStyle" onkeyup="searchFun()" placeholder="Search for Items.." style="width: 230px;height: 20px;"></div>
+  <div>Filter:<select id="filterByBrand" multiple="multiple" class="inputStyle">
+    <option value="samsung">Samsung</option>
+    <option value="lg">LG</option>
+    <option value="vu">VU</option>
+    <option value="thomson">Thomson</option>
+    <option value="Koryo">Koryo</option>
+    <option value="Micromax">Micromax </option>
+</select></div>
+<div>Sort By:<select id="sortId" class="inputStyle">
+  <option value="lowtohigh">Price: Low to High</option>
+  <option value="hightolow">Price: High to Low</option>
+</select></div>
+  </div>
   <div class="listCartDiv">
       <div id="cartList"></div>
 </div>
