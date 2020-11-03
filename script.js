@@ -7,24 +7,14 @@ var shoppingCart = (function() {
   // Private methods and propeties
   // =============================
   cart = [];
+  responseObj = [];
   $.ajax({ 
     type: 'GET', 
     url: 'cart.json', 
     dataType: 'json',
     success: function (data) { 
-      var listCartItem = "";
-         $.each(data.items, function(i, cartObj) {
-             listCartItem += " <div class='rowFlex'>"
-             + "<div class='card' style='width: 20rem;'><img class='card-img-top' src=" + cartObj.image + " alt=" + cartObj.name + "/>"
-             + "<div class='card-block'>"
-             +"<h4 class='card-title'>"+ cartObj.name +"</h4>"
-             +"<div><div style='float:left;display:flex;'><p class='card-text' style='text-decoration: red line-through;'>$"+ cartObj.price.display +"</p> &nbsp;&nbsp;<p class='card-text'>$"+ cartObj.price.actual +"</p></div>"
-             +"<div style='float:right;width: 40%;height: 30px;background-color: #80808091;text-align: center;padding: 4px 7px 0px 1px;'><a href='#' data-discount="+ cartObj.discount +" data-name="+ JSON.stringify(cartObj.name) +" data-price="+ cartObj.price.display +" class='add-to-cart' onclick='myFunction(event)'>Add to cart</a></div></div>"
-             + "</div>"
-             +  "</div>";
-             +  "</div>";
-          });
-          $('#cartList').html(listCartItem);
+          responseObj = data.items;
+          createItemList(data.items);
         }
   });
   // Constructor
@@ -173,6 +163,22 @@ $('.clear-cart').click(function() {
   displayCart();
 });
 
+function createItemList(data){
+  var listCartItem = "";
+  $('#cartList').html('');
+  $.each(data, function(i, cartObj) {
+    listCartItem += " <div class='rowFlex'>"
+    + "<div class='card' style='width: 17rem;'><img class='card-img-top' src=" + cartObj.image + " alt=" + cartObj.name + "/>"
+    + "<div class='card-block'>"
+    +"<h4 class='card-title'>"+ cartObj.name +"</h4>"
+    +"<div><div style='float:left;display:flex;'><p class='card-text' style='text-decoration: red line-through;'>$"+ cartObj.price.display +"</p> &nbsp;&nbsp;<p class='card-text'>$"+ cartObj.price.actual +"</p></div>"
+    +"<div style='float:right;width: 40%;height: 30px;background-color: #80808091;text-align: center;padding: 4px 7px 0px 1px;'><a href='#' data-discount="+ cartObj.discount +" data-name="+ JSON.stringify(cartObj.name) +" data-price="+ cartObj.price.display +" class='add-to-cart' onclick='myFunction(event)'>Add to cart</a></div></div>"
+    + "</div>"
+    +  "</div>";
+    +  "</div>";
+ });
+ $('#cartList').html(listCartItem);
+}
 
 function displayCart() {
   var cartArray = shoppingCart.listCart();
@@ -247,4 +253,60 @@ $('.show-cart').on("change", ".item-count", function(event) {
   displayCart();
 });
 
+function searchFun() {
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('myInput');
+  filter = input.value.toUpperCase();
+  var tempObj = [];
+  for (i = 0; i < responseObj.length; i++) {
+    var nameObj = responseObj[i].name;
+     if (nameObj.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+      tempObj.push(responseObj[i]);
+    }
+  }
+ 
+  if(tempObj.length > 0){
+    createItemList(tempObj);
+  }
+  else{
+    var listCartItem = "";
+    $('#cartList').html('');
+    listCartItem += "<div style='width:100%;display:flex;justify-content: center;'> No Results found</div>";
+ $('#cartList').html(listCartItem);
+  }
+}
+$('#filterByBrand').on("change",function () {
+  var selected = $("#filterByBrand option:selected");
+  var selectedObj = [];
+  selected.each(function () {
+      var filterObj = $(this).val();
+       for (i = 0; i < responseObj.length; i++) {
+        var nameObj = responseObj[i].name;
+         if (nameObj.toUpperCase().indexOf(filterObj.toUpperCase()) > -1) {
+          selectedObj.push(responseObj[i]);
+        }
+      }
+  });
+  if(selectedObj.length > 0){
+    createItemList(selectedObj);
+  }
+  else{
+    var listCartItem = "";
+    $('#cartList').html('');
+    listCartItem += "<div style='width:100%;display:flex;justify-content: center;'> No Results found</div>";
+ $('#cartList').html(listCartItem);
+  }
+});
+$('#sortId').on("change",function () {
+  var selected = $("#sortId option:selected");
+   selected.each(function () {
+    var sortBy = $(this).val();
+    if(sortBy === 'lowtohigh') {
+      responseObj = responseObj.sort((a, b) => a.price.actual - b.price.actual);
+    } else{
+      responseObj = responseObj.sort((a, b) => b.price.actual - a.price.actual);
+    }
+    createItemList(responseObj);
+  });
+});
 displayCart();
